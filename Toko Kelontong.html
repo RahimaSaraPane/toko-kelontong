@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Toko Kelontong</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #086444; margin: 0; padding: 20px; }
+        header { background: #41924f; color: white; padding: 10px 0; }
+        nav { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
+        nav a { text-decoration: none; padding: 10px 15px; background: lightgray; border-radius: 5px; transition: background 0.3s; color: rgb(27, 110, 6); font-weight: bold; }
+        nav a:hover { background: #ddd; }
+        section { margin-top: 50px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); max-width: 800px; margin-left: auto; margin-right: auto; }
+        table { width: 100%; margin: 20px 0; border-collapse: collapse; }
+        th, td { padding: 10px; border: 1px solid #dddddd; text-align: left; }
+        th { background: #b3e7bd; }
+        form { margin-bottom: 20px; }
+        input, select { padding: 10px; margin: 5px; width: calc(30% - 22px); border: 1px solid #478e4d; border-radius: 4px; }
+        button { padding: 10px 15px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background: #45a049; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h2>Selamat Datang di Aplikasi Toko Kelontong</h2>
+    </header>
+    
+    <nav>
+        <a href="#produk">Manajemen Produk</a>
+        <a href="#pelanggan">Manajemen Pelanggan</a>
+        <a href="#transaksi">Transaksi Penjualan</a>
+        <a href="#faktur">Laporan Faktur</a>
+        <a href="#rekap">Rekapitulasi Penjualan</a>
+        <a href="#stok">Laporan Stok</a>
+    </nav>
+
+    <!-- Pencarian Barang -->
+    <section>
+        <h3>Cari Barang</h3>
+        <input type="text" id="cari_produk" placeholder="Masukkan nama barang">
+        <button onclick="cariBarang()">Cari</button>
+        <table id="tabel_hasil_cari">
+            <tr><th>Nama Produk</th><th>Harga</th></tr>
+        </table>
+    </section>
+
+    <!-- Manajemen Produk -->
+    <section id="produk">
+        <h3>Manajemen Produk</h3>
+        <form id="productForm">
+            <input type="text" name="nama_produk" placeholder="Nama Produk" required>
+            <input type="number" name="harga" placeholder="Harga" required>
+            <input type="number" name="stok" placeholder="Stok" required>
+            <button type="submit">Tambah Produk</button>
+        </form>
+        <table id="productTable">
+            <tr><th>Nama</th><th>Harga</th><th>Stok</th></tr>
+        </table>
+    </section>
+
+    <!-- Manajemen Pelanggan -->
+    <section id="pelanggan">
+        <h3>Manajemen Pelanggan</h3>
+        <form id="customerForm">
+            <input type="text" name="nama_pelanggan" placeholder="Nama Pelanggan" required>
+            <input type="text" name="alamat_pelanggan" placeholder="Alamat" required>
+            <button type="submit">Tambah Pelanggan</button>
+        </form>
+        <table id="customerTable">
+            <tr><th>Nama</th><th>Alamat</th></tr>
+        </table>
+    </section>
+
+    <!-- Transaksi Penjualan -->
+    <section id="transaksi">
+        <h3>Transaksi Penjualan</h3>
+        <form id="transactionForm">
+            <select id="pelangganSelect" name="pelanggan" required>
+                <option value="">Pilih Pelanggan</option>
+            </select>
+            <select id="produkSelect" name="produk" required>
+                <option value="">Pilih Produk</option>
+            </select>
+            <input type="number" name="jumlah" placeholder="Jumlah" required min="1">
+            <button type="submit">Beli</button>
+        </form>
+        <table id="transactionTable">
+            <tr><th>Pelanggan</th><th>Produk</th><th>Jumlah</th><th>Total Harga</th><th>Tanggal</th></tr>
+        </table>
+    </section>
+
+    <!-- Laporan Faktur -->
+    <section id="faktur">
+        <h3>Laporan Faktur</h3>
+        <table id="fakturTable">
+            <tr><th>Pelanggan</th><th>Produk</th><th>Jumlah</th><th>Total Harga</th><th>Tanggal</th></tr>
+        </table>
+    </section>
+
+    <!-- Rekapitulasi Penjualan -->
+    <section id="rekap">
+        <h3>Rekapitulasi Penjualan</h3>
+        <table id="rekapTable">
+            <tr><th>Produk</th><th>Total Terjual</th><th>Total Pendapatan</th></tr>
+        </table>
+    </section>
+
+    <!-- Laporan Stok -->
+    <section id="stok">
+        <h3>Laporan Stok</h3>
+        <table id="stokTable">
+            <tr><th>Produk</th><th>Stok Tersisa</th></tr>
+        </table>
+    </section>
+
+    <!-- JavaScript -->
+    <script>
+
+      // Fungsi untuk update laporan stok
+      function updateStokReport() {
+          const stokTable = document.getElementById('stokTable');
+          stokTable.innerHTML = '<tr><th>Produk</th><th>Stok Tersisa</th></tr>';
+          
+          const products = document.getElementById('productTable').rows;
+          for(let i=1; i<products.length; i++) {
+              const newRow = stokTable.insertRow(-1);
+              newRow.innerHTML = `<td>${products[i].cells[0].innerText}</td><td>${products[i].cells[2].innerText}</td>`;
+          }
+      }
+
+      // Fungsi untuk update rekap penjualan
+      function updateSalesRecap() {
+          const rekapTable = document.getElementById('rekapTable');
+          rekapTable.innerHTML = '<tr><th>Produk</th><th>Total Terjual</th><th>Total Pendapatan</th></tr>';
+          
+          const salesData = {};
+          const transactions = document.getElementById('transactionTable').rows;
+          
+          for(let i=1; i<transactions.length; i++) {
+              const produk = transactions[i].cells[1].innerText;
+              const qty = parseInt(transactions[i].cells[2].innerText);
+              const total = parseInt(transactions[i].cells[3].innerText);
+              
+              if(!salesData[produk]) {
+                  salesData[produk] = { qty: 0, total: 0 };
+              }
+              salesData[produk].qty += qty;
+              salesData[produk].total += total;
+          }
+          
+          for(const [produk, data] of Object.entries(salesData)) {
+              const newRow = rekapTable.insertRow(-1);
+              newRow.innerHTML = `<td>${produk}</td><td>${data.qty}</td><td>${data.total}</td>`;
+          }
+      }
+
+      // Fungsi untuk menambahkan produk
+      document.getElementById('productForm').onsubmit = function(event) {
+          event.preventDefault();
+          
+          const namaProduk = this.nama_produk.value;
+          const harga = this.harga.value;
+          const stok = this.stok.value;
+
+          const productTable = document.getElementById('productTable');
+          const newRow = productTable.insertRow(-1);
+          newRow.innerHTML = `<td>${namaProduk}</td><td>${harga}</td><td>${stok}</td>`;
+          
+          // Update dropdown produk
+          const option = document.createElement("option");
+          option.value = namaProduk;
+          option.textContent = namaProduk;
+          document.getElementById('produkSelect').appendChild(option);
+
+          updateStokReport();
+          this.reset();
+      };
+
+      // Fungsi untuk menambahkan pelanggan
+      document.getElementById('customerForm').onsubmit = function(event) {
+          event.preventDefault();
+          
+          const namaPelanggan = this.nama_pelanggan.value;
+          const alamatPelanggan = this.alamat_pelanggan.value;
+
+          const customerTable = document.getElementById('customerTable');
+          const newRow = customerTable.insertRow(-1);
+          newRow.innerHTML = `<td>${namaPelanggan}</td><td>${alamatPelanggan}</td>`;
+          
+          // Update dropdown pelanggan
+          const pelangganSelect = document.getElementById('pelangganSelect');
+          const option = document.createElement("option");
+          option.textContent = namaPelanggan;
+          option.value = namaPelanggan;
+          pelangganSelect.appendChild(option);
+
+          this.reset();
+      };
+
+      // Fungsi untuk menambahkan transaksi
+      document.getElementById('transactionForm').onsubmit = function(event) {
+          event.preventDefault();
+
+          // Ambil data transaksi
+          const pelangganSelect = document.getElementById('pelangganSelect');
+          const produkSelect = document.getElementById('produkSelect');
+          
+          const pelanggan = pelangganSelect.options[pelangganSelect.selectedIndex].text;
+          const produk = produkSelect.options[produkSelect.selectedIndex].text;
+          
+          const jumlah = parseInt(this.jumlah.value);
+
+          // Update stok produk
+          const productRows = document.getElementById('productTable').rows;
+          
+          for(let i=1; i<productRows.length; i++) {
+              if(productRows[i].cells[0].innerText === produk) {
+                  const stokAwal = parseInt(productRows[i].cells[2].innerText);
+                  productRows[i].cells[2].innerText = stokAwal - jumlah;
+                  break;
+              }
+          }
+
+           // Hitung total harga
+           let hargaProduk;
+           for (let row of productRows) {
+               if (row.cells[0] && row.cells[0].innerText === produk) {
+                   hargaProduk = parseInt(row.cells[1].innerText);
+                   break;
+               }
+           }
+
+           const totalHarga = hargaProduk * jumlah;
+
+           // Tambahkan ke tabel transaksi DAN faktur
+           const addToTable = (tableId) => {
+               const table = document.getElementById(tableId);
+               const newRow = table.insertRow(-1);
+               newRow.innerHTML = `<td>${pelanggan}</td><td>${produk}</td><td>${jumlah}</td><td>${totalHarga}</td><td>${new Date().toLocaleDateString()}</td>`;
+           };
+           
+           addToTable('transactionTable');
+           addToTable('fakturTable');
+
+           // Update semua laporan
+           updateStokReport();
+           updateSalesRecap();
+           this.reset();
+       };
+
+       // Fungsi pencarian barang
+       function cariBarang() {
+           const query = document.getElementById('cari_produk').value.toLowerCase();
+           
+           const hasilTabel = document.getElementById('tabel_hasil_cari');
+           
+           hasilTabel.innerHTML = '<tr><th>Nama Produk</th><th>Harga</th></tr>';
+
+           for (let row of document.getElementById('productTable').rows) {
+               if (row.cells[0] && row.cells[0].innerText.toLowerCase().includes(query)) {
+                   const newRow = hasilTabel.insertRow(-1);
+                   newRow.innerHTML = `<td>${row.cells[0].innerText}</td><td>${row.cells[1].innerText}</td>`;
+               }
+           }
+       }
+
+   </script>
+
+</body>
+</html>
+
